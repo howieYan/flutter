@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 
 import '../app_color.dart' show AppColor, AppStyles, Contents;
-import '../modal/conversation_list.dart' show Conversation, mockConversations;
+import '../modal/conversation_list.dart' show Conversation, ConversationPageData, Device;
+
+
 
 class _ConversationItem extends StatelessWidget {
   const _ConversationItem({Key key, this.conversation})
-  :assert(conversation != null),
-  super(key: key);
+      : assert(conversation != null),
+        super(key: key);
   final Conversation conversation;
 
-
-	@override
-	Widget build(BuildContext context) {
+  @override
+  Widget build(BuildContext context) {
     // img的初始化
     Widget avatar;
     if (conversation.isAvatarFronNet()) {
@@ -26,7 +27,6 @@ class _ConversationItem extends StatelessWidget {
         width: Contents.ConversationActiveSize,
         height: Contents.ConversationActiveSize,
       );
-      
     }
     Widget avatarContainer;
     if (conversation.badge > 0) {
@@ -36,10 +36,12 @@ class _ConversationItem extends StatelessWidget {
         height: Contents.UnRedMsgNotiFyDotSize,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(Contents.UnRedMsgNotiFyDotSize / 2.0),
+          borderRadius:
+              BorderRadius.circular(Contents.UnRedMsgNotiFyDotSize / 2.0),
           color: Color(AppColor.NotifyDotBg),
         ),
-        child: Text(conversation.badge.toString(), style: AppStyles.unRedMsgCountDat),
+        child: Text(conversation.badge.toString(),
+            style: AppStyles.unRedMsgCountDat),
       );
 
       avatarContainer = Stack(
@@ -47,8 +49,8 @@ class _ConversationItem extends StatelessWidget {
         children: <Widget>[
           avatar,
           Positioned(
-            right: -6.0, 
-            top: -6.0, 
+            right: -6.0,
+            top: -6.0,
             child: unRedMsgCountText,
           ),
         ],
@@ -56,8 +58,6 @@ class _ConversationItem extends StatelessWidget {
     } else {
       avatarContainer = avatar;
     }
-
-
 
     var rightAre = <Widget>[
       Text(conversation.createAt, style: AppStyles.desStyle),
@@ -82,53 +82,117 @@ class _ConversationItem extends StatelessWidget {
         size: Contents.ConversationMuteIconSize,
       ));
     }
-		return Container(
+    return Container(
       padding: const EdgeInsets.all(10.0),
       decoration: BoxDecoration(
-        color: Color(AppColor.ConversationItemBg),
+          color: Color(AppColor.ConversationItemBg),
+          border: Border(
+            bottom: BorderSide(
+                color: Color(AppColor.ConversationBorderSide),
+                width: Contents.ConversationBorderWidth),
+          )),
+      // color: Color(AppColor.ConversationItemBg),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          avatarContainer,
+          Container(
+            width: 10.0,
+          ),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(conversation.title, style: AppStyles.TitleStyle),
+                Text(conversation.des, style: AppStyles.desStyle),
+              ],
+            ),
+          ),
+          Container(
+            width: 10.0,
+          ),
+          Column(children: rightAre),
+        ],
+      ),
+    );
+  }
+}
+
+class _DeviceInfoItem extends StatelessWidget {
+  const _DeviceInfoItem({this.device: Device.WIN}) :
+      assert(device != null);
+  
+  final Device device;
+  
+  int get iconName  {
+    return device == Device.WIN ? 0xe640 :  0xe681;
+  }
+  
+  String get deviceName {
+    return device == Device.WIN ? 'Windows' :  'Mac';
+  }
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(10.0),
+      decoration: BoxDecoration(
         border: Border(
           bottom: BorderSide(
-            color: Color(AppColor.ConversationBorderSide),
-            width: Contents.ConversationBorderWidth
-          ),
-        )
+            width: Contents.ConversationBorderWidth,
+            color: Color(AppColor.ConversationBorderSide)
+          )
+        ),
+        color: Color(AppColor.DeviceInfoItemBg)
       ),
-			// color: Color(AppColor.ConversationItemBg),
-			child: Row(
-				crossAxisAlignment: CrossAxisAlignment.center,
-				children: <Widget>[
-					avatarContainer,
-          Container(width: 10.0,),
-					Expanded(
-						child: Column(
-							crossAxisAlignment: CrossAxisAlignment.start,
-							children: <Widget>[
-								Text(conversation.title, style: AppStyles.TitleStyle),
-								Text(conversation.des, style: AppStyles.desStyle),
-							],
-						),
-					),
-          Container(width: 10.0,),
-					Column(
-						children: rightAre
-					),
-				],
-			),
-		);
-	}
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          Icon(
+            IconData(
+              this.iconName,
+              fontFamily: Contents.IconFontFamily,
+            ),
+            size: 24.0,
+            color: Color(AppColor.DeviceInfoItemText),
+          ),
+          SizedBox(width: 16.0,),
+          Text(
+            '$deviceName 微信已登录，手机通知已关闭',
+            style: AppStyles.DeviceInfoItemTextStyle,
+          )
+        ],
+      ),
+    );
+  }
 }
+
+
 class ConversationPage extends StatefulWidget {
-	_ConversationPageState createState() => _ConversationPageState();
+  _ConversationPageState createState() => _ConversationPageState();
 }
 
 class _ConversationPageState extends State<ConversationPage> {
-	@override
-	Widget build(BuildContext context) {
-		return ListView.builder(
-			itemBuilder: (BuildContext context, int index) {
-				return _ConversationItem(conversation: mockConversations[index],);
-			},
-			itemCount: mockConversations.length,
-		);
-	}
+  final ConversationPageData data = ConversationPageData.mock();
+  @override
+  Widget build(BuildContext context) {
+    var mockConversationData = data.conversations;
+    return ListView.builder(
+      itemBuilder: (BuildContext context, int index) {
+        if (data.device != null) {
+          if (index == 0) {
+            return _DeviceInfoItem(device: data.device,);
+          }
+          return _ConversationItem(
+            conversation: mockConversationData[index - 1],
+          );
+        } else {
+          return _ConversationItem(
+            conversation: mockConversationData[index],
+          );
+        }
+      },
+      itemCount: data.device != null ? mockConversationData.length + 1 : mockConversationData.length,
+    );
+  }
 }
