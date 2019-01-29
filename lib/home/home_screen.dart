@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../app_color.dart' show AppColor, Contents;
+
+
+import './conversation_page.dart';
 class NavigationIconView {
 	final String _title;
 	final IconData _icon;
@@ -11,12 +14,9 @@ class NavigationIconView {
 			_icon = icon,
 			_activeIcon = activeIcon,
 			item = new BottomNavigationBarItem(
-				icon: Icon(icon, color: Color(AppColor.TabColor),size: 15.0,),
-				activeIcon: Icon(activeIcon, color: Color(AppColor.TabActiveColor),),
-				title: Text(title, style: TextStyle(
-					fontSize: 14.0,
-					color: Color(AppColor.TabActiveColor),
-				),),
+				icon: Icon(icon),
+				activeIcon: Icon(activeIcon),
+				title: Text(title),
 				backgroundColor: Colors.white
 			);
 }
@@ -26,7 +26,10 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+	PageController _pageController;
+	int _currentIndex = 0;
 	List<NavigationIconView> _navigationViews;
+	List<Widget> _pages;
 	@override
 	void initState() {
 		super.initState();
@@ -76,23 +79,34 @@ class _HomeScreenState extends State<HomeScreen> {
 				),
 			),
 		];
-		
+		_pageController = PageController(initialPage: _currentIndex);
+		_pages = [
+			ConversationPage(),
+			Container(color: Colors.green),
+			Container(color: Colors.blue),
+			Container(color: Colors.yellow),
+		];
 	}
 	@override
 	Widget build(BuildContext context) {
 		final BottomNavigationBar botNavBar = BottomNavigationBar(
+			fixedColor: Color(AppColor.TabActiveColor),
 			items: _navigationViews.map((NavigationIconView view) {
 				return view.item;
 			}).toList(),
-			currentIndex: 0,
+			currentIndex: _currentIndex,
 			type: BottomNavigationBarType.fixed,
 			onTap: (int index) {
-				print('$index');
+				setState(() {
+					_currentIndex = index;
+					_pageController.animateToPage(_currentIndex, duration: Duration(milliseconds: 200), curve: Curves.easeInOut);
+				});
 			},
 		);
 		return Scaffold(
 			appBar: AppBar(
 				title: Text('微信'),
+				elevation: 0.0,
 				actions: <Widget>[
 					IconButton(
 						icon: Icon(Icons.search),
@@ -106,8 +120,17 @@ class _HomeScreenState extends State<HomeScreen> {
 					Container(width: 10.0,),
 				],
 			),
-			body: Container(
-				color: Colors.red,
+			body: PageView.builder(
+				itemBuilder: (BuildContext context, int index) {
+					return _pages[index];
+				},
+				controller: _pageController,
+				itemCount: _pages.length,
+				onPageChanged: (int index) {
+					setState(() {
+						_currentIndex = index;
+					});
+				},
 			),
 			bottomNavigationBar: botNavBar,
 		);
