@@ -40,6 +40,10 @@ flutter:
   assets:
     - asset/images/timg.jpeg
     - asset/images/userActiver.jpg
+    - asset/images/ANewFriend.png
+    - asset/images/GroupChat.png
+    - asset/images/TheLabel.png
+    - asset/images/ThePublic.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.io/assets-and-images/#resolution-aware.

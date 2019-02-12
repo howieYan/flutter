@@ -4,6 +4,7 @@ import '../app_color.dart' show AppColor, Contents;
 
 
 import './conversation_page.dart';
+import './contacts_page.dart';
 class NavigationIconView {
 	final String _title;
 	final IconData _icon;
@@ -82,7 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
 		_pageController = PageController(initialPage: _currentIndex);
 		_pages = [
 			ConversationPage(),
-			Container(color: Colors.green),
+			ContactsPage(),
 			Container(color: Colors.blue),
 			Container(color: Colors.yellow),
 		];

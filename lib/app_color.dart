@@ -41,4 +41,5 @@ class Contents {
   static const ConversationBorderWidth = 1.0;
   static const UnRedMsgNotiFyDotSize = 20.0;
   static const ConversationMuteIconSize = 18.0;
+  static const ContactAvatarSize = 40.0;
 }
